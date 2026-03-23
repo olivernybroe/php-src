@@ -2671,7 +2671,11 @@ simple_list:
 			break;
 		case ZEND_AST_INSTANCEOF:
 			zend_ast_export_ex(str, ast->child[0], 0, indent);
-			smart_str_appends(str, " instanceof ");
+			if (ast->attr) {
+				smart_str_appends(str, " !instanceof ");
+			} else {
+				smart_str_appends(str, " instanceof ");
+			}
 			zend_ast_export_ns_name(str, ast->child[1], 0, indent);
 			break;
 		case ZEND_AST_YIELD:

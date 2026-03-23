@@ -76,7 +76,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %left T_SL T_SR
 %left '+' '-'
 %left '*' '/' '%'
-%precedence '!'
+%right '!'
 %precedence T_INSTANCEOF
 %precedence '~' T_INT_CAST T_DOUBLE_CAST T_STRING_CAST T_ARRAY_CAST T_OBJECT_CAST T_BOOL_CAST T_UNSET_CAST '@'
 %right T_POW
@@ -1350,6 +1350,8 @@ expr:
 			{ $$ = zend_ast_create_binary_op(ZEND_SPACESHIP, $1, $3); }
 	|	expr T_INSTANCEOF class_name_reference
 			{ $$ = zend_ast_create(ZEND_AST_INSTANCEOF, $1, $3); }
+	|	expr '!' T_INSTANCEOF class_name_reference
+			{ $$ = zend_ast_create_ex(ZEND_AST_INSTANCEOF, 1, $1, $4); }
 	|	'(' expr ')' {
 			$$ = $2;
 			if ($$->kind == ZEND_AST_CONDITIONAL) $$->attr = ZEND_PARENTHESIZED_CONDITIONAL;

@@ -11066,11 +11066,17 @@ static void zend_compile_instanceof(znode *result, zend_ast *ast) /* {{{ */
 	znode obj_node, class_node;
 	zend_op *opline;
 
+	bool negated = ast->attr == 1;
+
 	zend_compile_expr(&obj_node, obj_ast);
 	if (obj_node.op_type == IS_CONST) {
 		zend_do_free(&obj_node);
 		result->op_type = IS_CONST;
-		ZVAL_FALSE(&result->u.constant);
+		if (negated) {
+			ZVAL_TRUE(&result->u.constant);
+		} else {
+			ZVAL_FALSE(&result->u.constant);
+		}
 		return;
 	}
 
@@ -11086,6 +11092,10 @@ static void zend_compile_instanceof(znode *result, zend_ast *ast) /* {{{ */
 		opline->extended_value = zend_alloc_cache_slot();
 	} else {
 		SET_NODE(opline->op2, &class_node);
+	}
+
+	if (negated) {
+		opline = zend_emit_op_tmp(result, ZEND_BOOL_NOT, result, NULL);
 	}
 }
 /* }}} */
